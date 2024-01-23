@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -7,19 +8,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String appTitle = 'Flutter layout demo';
+    const String appTitle = 'Basic Flutter States';
     return MaterialApp(
       title: appTitle,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text(appTitle),
+          title: const Text(
+            appTitle,
+          ),
         ),
-        // #docregion addWidget
+        backgroundColor: const Color(0xFFFFF1E0),
         body: const SingleChildScrollView(
           child: Column(
             children: [
               ImageSection(
-                image: 'images/lake.jpg',
+                image: 'assets/images/lakebg.jpg',
               ),
               TitleSection(
                 name: 'Oeschinen Lake Campground',
@@ -39,13 +42,12 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
-        // #enddocregion addWidget
       ),
     );
   }
 }
 
-class TitleSection extends StatelessWidget {
+class TitleSection extends StatefulWidget {
   const TitleSection({
     super.key,
     required this.name,
@@ -56,28 +58,46 @@ class TitleSection extends StatelessWidget {
   final String location;
 
   @override
+  _TitleSectionState createState() => _TitleSectionState();
+}
+
+class _TitleSectionState extends State<TitleSection> {
+  bool _isFavorited = true;
+  int _favoriteCount = 41;
+
+  void _toggleFavorite() {
+    setState(() {
+      if (_isFavorited) {
+        _favoriteCount -= 1;
+        _isFavorited = false;
+      } else {
+        _favoriteCount += 1;
+        _isFavorited = true;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Row(
         children: [
           Expanded(
-            /*1*/
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /*2*/
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
-                    name,
+                    widget.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 Text(
-                  location,
+                  widget.location,
                   style: TextStyle(
                     color: Colors.grey[500],
                   ),
@@ -85,14 +105,11 @@ class TitleSection extends StatelessWidget {
               ],
             ),
           ),
-          /*3*/
-          // #docregion Icon
-          Icon(
-            Icons.star,
-            color: Colors.red[500],
+          FavoriteWidget(
+            isFavorited: _isFavorited,
+            favoriteCount: _favoriteCount,
+            onFavoriteToggle: _toggleFavorite,
           ),
-          // #enddocregion Icon
-          const Text('41'),
         ],
       ),
     );
@@ -185,7 +202,6 @@ class TextSection extends StatelessWidget {
   }
 }
 
-// #docregion ImageSection
 class ImageSection extends StatelessWidget {
   const ImageSection({super.key, required this.image});
 
@@ -193,51 +209,27 @@ class ImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // #docregion Image-asset
     return Image.asset(
       image,
       width: 600,
       height: 240,
       fit: BoxFit.cover,
     );
-    // #enddocregion Image-asset
   }
 }
-// #enddocregion ImageSection
 
-// #docregion FavoriteWidget
-class FavoriteWidget extends StatefulWidget {
-  const FavoriteWidget({super.key});
+class FavoriteWidget extends StatelessWidget {
+  const FavoriteWidget({
+    super.key,
+    required this.isFavorited,
+    required this.favoriteCount,
+    required this.onFavoriteToggle,
+  });
 
-  @override
-  State<FavoriteWidget> createState() => _FavoriteWidgetState();
-}
-// #enddocregion FavoriteWidget
+  final bool isFavorited;
+  final int favoriteCount;
+  final VoidCallback onFavoriteToggle;
 
-// #docregion _FavoriteWidgetState, _FavoriteWidgetState-fields, _FavoriteWidgetState-build
-class _FavoriteWidgetState extends State<FavoriteWidget> {
-  // #enddocregion _FavoriteWidgetState-build
-  bool _isFavorited = true;
-  int _favoriteCount = 41;
-
-  // #enddocregion _FavoriteWidgetState-fields
-
-  // #docregion _toggleFavorite
-  void _toggleFavorite() {
-    setState(() {
-      if (_isFavorited) {
-        _favoriteCount -= 1;
-        _isFavorited = false;
-      } else {
-        _favoriteCount += 1;
-        _isFavorited = true;
-      }
-    });
-  }
-
-  // #enddocregion _toggleFavorite
-
-  // #docregion _FavoriteWidgetState-build
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -248,21 +240,20 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
           child: IconButton(
             padding: const EdgeInsets.all(0),
             alignment: Alignment.centerRight,
-            icon: (_isFavorited
+            icon: (isFavorited
                 ? const Icon(Icons.star)
                 : const Icon(Icons.star_border)),
             color: Colors.red[500],
-            onPressed: _toggleFavorite,
+            onPressed: onFavoriteToggle,
           ),
         ),
         SizedBox(
           width: 18,
           child: SizedBox(
-            child: Text('$_favoriteCount'),
+            child: Text('$favoriteCount'),
           ),
         ),
       ],
     );
   }
-// #docregion _FavoriteWidgetState-fields
 }
